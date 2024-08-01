@@ -27,3 +27,22 @@
 이미지나 주소 클릭하시면 영상을 보실 수 있습니다. </BR>
 
 ## 기능 구현
+
+### [플레이어 이동 구현]
+언리얼 엔진5에서 제공하는 Enhanced Input System을 이용하였습니다. </BR>
+플레이어는 점프, 이동, 슈팅 총 3가지 행동을 할 수 있으며 행동들을 Input Action을 통해 만들었습니다. </BR></BR>
+
+
+![InputAction](https://github.com/user-attachments/assets/e97e085c-95f8-4926-a930-2825fa0cbc17)
+<div align="center"><strong>생성된 3가지 Input Action</strong></div></BR>
+
+생성한 Input Action들을 Input Mapping Context에 등록하여 3종류의 행동을 키 입력에 연동시킵니다.</BR>
+각 행동들은 Input Action에서 설정한 값의 타입에 따라 키를 설정할 수 있습니다.</BR></BR>
+
+![IMC](https://github.com/user-attachments/assets/2663473e-cbc4-40d0-9435-5a668242eaf4)
+<div align="center"><strong>Input Mapping Context에 연동된 Input Action</strong></div></BR>
+
+특히 이동관련 키 세팅은 한 개의 키를 기준으로 모디파이어를 두어 쉽게 설정할 수 있습니다.</BR>
+오른쪽으로 이동하는 D키를 기준으로 한다면 A키는 반대인 왼쪽으로 움직이므로 모디파이어에서 Negative를 설정해줍니다.</br>
+좌우가 아닌 상하로 움직이는 경우 모디파이어를 스위즐 입력 측 값을 YXZ로 두어 X축과 Y축을 바꿔 좌우를 상하로 움직이도록 설정합니다.</BR></BR>
+
