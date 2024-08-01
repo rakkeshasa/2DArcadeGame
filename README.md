@@ -46,3 +46,17 @@
 오른쪽으로 이동하는 D키를 기준으로 한다면 A키는 반대인 왼쪽으로 움직이므로 모디파이어에서 Negative를 설정해줍니다.</br>
 좌우가 아닌 상하로 움직이는 경우 모디파이어를 스위즐 입력 측 값을 YXZ로 두어 X축과 Y축을 바꿔 좌우를 상하로 움직이도록 설정합니다.</BR></BR>
 
+![InputSetting](https://github.com/user-attachments/assets/534ee593-99d4-4186-8ba1-2d1f5aedc3b5)
+<div align="center"><strong>BP_Player에서 BeginPlay노드에 컨트롤러 설정하기</strong></div></BR>
+
+Input Mapping Context(IMC)에 등록된 행동들은 몬스터들이 아닌 플레이어만 사용할 행동들이므로 BP_Player의 부모인 BP_BaseCharacter에 설정할 필요가 없습니다.</br>
+BP_Player의 BeginPlay노드에 PlayerController에 Enhanced Input System을 등록하여 IMC에 등록된 키 입력을 바탕으로 컨트롤 할 수 있게 해줍니다.</BR>
+
+![IA_MOVE](https://github.com/user-attachments/assets/cb7adb38-00b1-4e8c-bff8-77eed9be0b4b)
+<div align="center"><strong>이동 관련 키 입력이 된 경우</strong></div></BR>
+
+W, A, S, D가 입력된 경우 IMC에서 해당 키가 연동된 행동을 찾아 이벤트를 발생시킵니다.</BR>
+해당 행동은 IA_Move의 Input Action이므로 IA_Move 이벤트 노드에서 입력값을 처리해줍니다.</br>
+Add Movement Input노드를 통해 캐릭터를 앞으로 움직이게 하며 IMC에서 D를 기준으로 모디파이어를 설정해줬기 때문에 X축에 1값만 줘도 입력된 방향으로 나아갑니다.</BR></BR>
+
+
