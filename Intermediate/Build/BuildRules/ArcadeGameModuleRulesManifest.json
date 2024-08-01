@@ -1,0 +1,11 @@
+{
+	"SourceFiles": [
+		"D:\\UE_5.3\\ArcadeGame\\Plugins\\RootMovement_5.3\\Source\\RootMovement\\RootMovement.Build.cs",
+		"D:\\UE_5.3\\ArcadeGame\\Intermediate\\Source\\ArcadeGame.Build.cs",
+		"D:\\UE_5.3\\ArcadeGame\\Intermediate\\Source\\ArcadeGame.Target.cs",
+		"D:\\UE_5.3\\ArcadeGame\\Intermediate\\Source\\ArcadeGameClient.Target.cs",
+		"D:\\UE_5.3\\ArcadeGame\\Intermediate\\Source\\ArcadeGameEditor.Target.cs",
+		"D:\\UE_5.3\\ArcadeGame\\Intermediate\\Source\\ArcadeGameServer.Target.cs"
+	],
+	"EngineVersion": "5.3.2"
+}
