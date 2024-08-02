@@ -8,7 +8,8 @@
 ---
 - [간단한 소개](#간단한-소개)
 - [플레이 영상](#플레이-영상)
-
+- [기능 구현](#기능-구현)
+  * [플레이어 이동 구현](#플레이어-이동-구현)
 
 ## 간단한 소개
 블루프린트로만 제작한 단일 스테이지 아케이드 게임입니다.</BR></BR>
@@ -58,5 +59,12 @@ BP_Player의 BeginPlay노드에 PlayerController에 Enhanced Input System을 등
 W, A, S, D가 입력된 경우 IMC에서 해당 키가 연동된 행동을 찾아 이벤트를 발생시킵니다.</BR>
 해당 행동은 IA_Move의 Input Action이므로 IA_Move 이벤트 노드에서 입력값을 처리해줍니다.</br>
 Add Movement Input노드를 통해 캐릭터를 앞으로 움직이게 하며 IMC에서 D를 기준으로 모디파이어를 설정해줬기 때문에 X축에 1값만 줘도 입력된 방향으로 나아갑니다.</BR></BR>
+
+![rotation](https://github.com/user-attachments/assets/7168132e-820c-4cbb-a981-ee36ec8aaf58)
+<div align="center"><strong>좌우 키 방향에 따른 캐릭터 방향 전환</strong></div></BR>
+
+X축의 값이 1 이상이라면 캐릭터가 움직이는 중 이므로 캐릭터가 올바른 방향을 바라본 채 앞으로 나아가게끔 해야합니다.</br>
+캐릭터의 Sprite는 오른쪽을 바라보고 있으므로 D키를 누른다면 방향 전환이 필요 없습니다.</BR>
+A키를 누른다면 Sprite와 반대인 왼쪽을 바라봐야하므로 Make Rotator 노드를 통해 Z축을 180도 회전하여 왼쪽을 바라보도록 합니다.</br>
 
 
