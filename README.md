@@ -67,4 +67,28 @@ X축의 값이 1 이상이라면 캐릭터가 움직이는 중 이므로 캐릭�
 캐릭터의 Sprite는 오른쪽을 바라보고 있으므로 D키를 누른다면 방향 전환이 필요 없습니다.</BR>
 A키를 누른다면 Sprite와 반대인 왼쪽을 바라봐야하므로 Make Rotator 노드를 통해 Z축을 180도 회전하여 왼쪽을 바라보도록 합니다.</br>
 
+### [애니메이션 연동]
+애니메이션을 사용하기 위해서는 Flipbook들을 Animation Source에 설정을 해줘야합니다.</br>
 
+![AnimationSource](https://github.com/user-attachments/assets/446ebfcb-6347-4931-8d26-1e3796b97674)
+<div align="center"><strong>Animation Source에 설정된 플립북들</strong></div></BR>
+
+Animation Source는 사용할 모든 플립북의 모음으로 Animation Blueprint에서 해당 플립북을 손쉽게 쓸 수 있도록 해줍니다.</br>
+
+![ABP](https://github.com/user-attachments/assets/4f25bc92-b765-4b76-9087-86c58bceea58)
+<div align="center"><strong>등록된 플립북을 Animation Blueprint에서 사용하는 모습</strong></div></BR>
+
+Animation Blueprint에서는 캐릭터가 어떤 상황에서 어떤 플립북을 재생할지 설정할 수 있습니다.</br>
+
+![RunToIdle](https://github.com/user-attachments/assets/4ed7e17b-3a29-4dee-bba4-c1a15b1f4f5e)
+<div align="center"><strong>Run 애니메이션에서 Idle로 돌아가는 조건</strong></div></BR>
+
+현재 애니메이션에서 다른 애니메이션을 재생하는 조건을 설정해주고 해당 조건을 충족하면 다른 애니메이션을 재생합니다.</br>
+여기서 Owning Player은 BP_Player 타입의 변수로 Animation Blueprint가 Init할 때 Get Owning Actor 노드를 통해 가져왔습니다.</br>
+캐릭터의 속도가 0보다 크지 않다면 더이상 앞으로 가고 있지 않으므로 Run 애니메이션에서 Idle 애니메이션으로 바꿔서 재생합니다.</br>
+
+![OwningActor](https://github.com/user-attachments/assets/3e019e88-0b1d-4713-b909-e32fc40b555b)
+<div align="center"><strong>BP_Player에서 사용할 애니메이션 클래스 설정</strong></div></BR>
+
+Animation Blueprint에서 Owning Player을 갖고 오기 위해서는 BP_Player에 해당 애니메이션 클래스를 사용하겠다고 지정해줘야합니다.</br>
+Animation Component의 디테일 탭에서 Paper ZD의 Anim Instance Class에 위에서 만든 Animation Blueprint를 설정하여 Ownint Player를 참조할 수 있도록 합니다.</br>
