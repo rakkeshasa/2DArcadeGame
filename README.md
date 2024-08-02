@@ -67,6 +67,8 @@ X축의 값이 1 이상이라면 캐릭터가 움직이는 중 이므로 캐릭�
 캐릭터의 Sprite는 오른쪽을 바라보고 있으므로 D키를 누른다면 방향 전환이 필요 없습니다.</BR>
 A키를 누른다면 Sprite와 반대인 왼쪽을 바라봐야하므로 Make Rotator 노드를 통해 Z축을 180도 회전하여 왼쪽을 바라보도록 합니다.</br>
 
+---
+
 ### [애니메이션 연동]
 애니메이션을 사용하기 위해서는 Flipbook들을 Animation Source에 설정을 해줘야합니다.</br>
 
@@ -92,3 +94,45 @@ Animation Blueprint에서는 캐릭터가 어떤 상황에서 어떤 플립북�
 
 Animation Blueprint에서 Owning Player을 갖고 오기 위해서는 BP_Player에 해당 애니메이션 클래스를 사용하겠다고 지정해줘야합니다.</br>
 Animation Component의 디테일 탭에서 Paper ZD의 Anim Instance Class에 위에서 만든 Animation Blueprint를 설정하여 Ownint Player를 참조할 수 있도록 합니다.</br>
+
+---
+
+### [발사체 구현]
+발사체는 플레이어도 쏠 수 있고 특정 몬스터 또한 파이어볼을 뱉으므로 모든 발사체의 부모클래스인 BaseProjectile를 생성합니다.</br>
+BP_BaseProjectile은 Actor타입으로 해당 Actor가 발사체 처럼 행동하기 위해서는 ProjectileMovement 컴포넌트가 필요합니다.</br>
+ProjectileMovement 컴포넌트는 발사체가 몇의 속도로 날라가고 중력의 영향을 얼마나 받는지 설정하여 Actor가 발사체처럼 작동하도록 합니다.</br>
+ProjectileMovement가 작동하기 위해서는 Collision이 필요하므로 구형 발사체를 사용하기 위해 Sphere Collision 컴포넌트를 추가했습니다.</br>
+
+![BaseProjectile](https://github.com/user-attachments/assets/4056739c-5e67-4384-b6b1-5909803cf539)
+<div align="center"><strong>BaseProjectile에 설정된 컴포넌트와 발사체 설정</strong></div></BR>
+
+플레이어와 몬스터는 발사체에 맞으면 데미지를 받아야하므로 Sphere Collision에 Pawn타입의 객체가 발사체에 부딪힌다면 이벤트를 발생시켜야합니다.</br>
+Begin Overlap 노드를 이용하여 충돌할 시 누구와 충돌했는지 알기 위해 BP_BaseCharacter로 캐스팅하고 발사체를 발사한 객체와 맞은 객체가 다르다면 데미지를 적용합니다.</br>
+
+![ProjectileDamage](https://github.com/user-attachments/assets/06f2d0fd-135a-40fb-bdd5-f620a20a874d)
+<div align="center"><strong>발사체가 Pawn타입의 객체와 부딪힐 시 데미지 주기</strong></div></BR>
+
+여기서 문제점은 발사체에 맞은 대상은 Begin Overlap 노드를 통해 누군지 아는데 발사체를 발사한 주체를 어떻게 아는지 알 수가 없습니다.</br>
+해결 방안은 발사체를 생성할 때 사용하는 SpawnActor노드에 Owner 입력칸에 Self(발사체를 발사한 주체)를 넣어 해당 정보를 얻을 수 있게합니다.</br>
+
+![SpawnActor](https://github.com/user-attachments/assets/eea74962-e809-4b92-b2ae-b50553fa449b)
+<div align="center"><strong>누가 발사체를 쐈는지 Owner에 설정하기</strong></div></BR>
+
+이후 데미지를 준 발사체는 Destroy Actor노드를 통해 사라지게 만들어 맞은 객체를 관통하여 앞으로 나아가지 않도록 합니다.</br>
+
+플레이어 발사체는 총 3발만 발사할 수 있고 발사체가 화면밖으로 나가거나 파괴될 때마다 1발 씩 충전됩니다.</br>
+또한 슈팅 버튼을 몇 초간 누르면 차지 샷이 나가 더욱 강력한 데미지를 입힐 수 있지만 차지 샷은 강력한 만큼 3발을 소모합니다.</br>
+
+![ScreenProjectile](https://github.com/user-attachments/assets/ebb1e9f7-dbe5-49e3-96e5-56a0de3a0671)
+<div align="center"><strong>발사체가 화면밖으로 나가는 경우</strong></div></BR>
+
+플레이어만 사용하는 발사체이므로 BaseProjectile을 상속받는 PlayerProjectile을 생성합니다.</br>
+PlayerProjectile에서는 발사체가 화면 밖으로 나가는 경우 Destory노드를 통해 파괴되도록 합니다.</br>
+Player Controller를 통해 Convert World Location To Screen노드를 가져와 발사체가 현재 화면상 어느 위치에 있는지 확인하고 
+화면의 X축보다 크거나 작으면 화면 밖으로 나간 것이므로 해당 발사체를 파괴합니다.</br>
+
+![Restore](https://github.com/user-attachments/assets/536a5a80-bf43-4306-90c5-f9d03d39f450)
+<div align="center"><strong>발사체가 파괴될 경우</strong></div></BR>
+
+발사체가 파괴될 경우 플레이어는 발사한 탄에 따라 샷 에너지를 회복해야합니다.</br>
+일반 탄을 쐈을 경우 1발, 차지 샷을 쐈을 경우 3발을 회복해야합니다.
