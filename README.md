@@ -134,5 +134,38 @@ Player Controller를 통해 Convert World Location To Screen노드를 가져와 
 ![Restore](https://github.com/user-attachments/assets/536a5a80-bf43-4306-90c5-f9d03d39f450)
 <div align="center"><strong>발사체가 파괴될 경우</strong></div></BR>
 
-발사체가 파괴될 경우 플레이어는 발사한 탄에 따라 샷 에너지를 회복해야합니다.</br>
-일반 탄을 쐈을 경우 1발, 차지 샷을 쐈을 경우 3발을 회복해야합니다.
+발사체가 파괴될 경우 플레이어는 발사한 탄에 따라 샷 에너지를 회복합니다.</br>
+일반 탄을 쐈을 경우 1발, 차지 샷을 쐈을 경우 3발을 회복해야합니다.</br>
+
+![ShotEnergyRestore](https://github.com/user-attachments/assets/c5457540-5cb6-49f1-870b-fe56b5fc6a65)
+<div align="center"><strong>샷 에너지 회복하기</strong></div></BR>
+
+발사체는 파괴될 때 자신의 클래스(기본 샷, 차지샷)를 Restore Shot Energy 함수노드에 입력값으로 넣고
+클래스 이름을 Key값으로 하고, 회복할 샷 에너지 양인 int형을 Value값으로 갖는 맵에서 Find함수를 통해 샷 에너지를 몇을 회복할지 결정합니다.</br>
+샷 에너지는 최대 3발로 3발이 넘지 않도록 MIN노드를 이용하여 조정했습니다.</BR>
+
+### [체력 설정]
+몬스터와 플레이어 캐릭터는 Actor로 일정 체력을 갖고 있으며, 공격에 맞을 시 데미지에 따라 체력이 닳습니다.</BR>
+Actor Component를 통해 체력 시스템을 만들고 몬스터와 플레이어 캐릭터에게 컴포넌트를 부착하는 형식으로 시스템을 구축했습니다.</BR>
+
+![BPC_Vitality](https://github.com/user-attachments/assets/707d8a91-6570-42af-bfc3-ed4bd38b0d11)
+<div align="center"><strong>게임 시작 시 초기 체력 세팅하기</strong></div></BR>
+
+Actor Component인 BPC_Vitality는 게임 시작 시 초기 체력을 세팅하고 공격받을 시 체력을 깍는 함수를 갖고 있습니다.</br>
+초기 체력 세팅은 컴포넌트에 MaxHealth와 CurrentHealth를 변수를 두어 현재 체력이 최대 체력으로 세팅되도록 합니다.</br>
+
+![4](https://github.com/user-attachments/assets/a5e4d3d8-a514-4b18-a1fc-1dd6a5d33fd3)
+</br>
+만든 BPC_Vitality는 BaseCharacter에 컴포넌트를 추가하여 BaseCharacter가 상속받는 모든 Actor가 체력 시스템을 갖습니다.</br>
+각각의 Actor는 디테일 탭에서 MaxHealth를 세팅하여 최대 체력을 다르게 세팅할 수 있습니다.</br>
+
+![AnyDamage](https://github.com/user-attachments/assets/b72c70a3-a968-4aa8-8f4d-61ca78442bda)
+<div align="center"><strong>데미지를 체력에 반영하기</strong></div></BR>
+
+AnyDamage는 언리얼엔진에서 제공하는 함수로 피격판정을 받을 경우 활성화 되는 이벤트 노드입니다.</br>
+BPC_Vitality에서 IsDefeated변수를 통해 Actor의 생사를 확인하고 죽지 않았다면 BPC_Vitality에 있는 Receive Damage 함수를 호출합니다.</br>
+Receive Damage함수는 받은 데미지 수치를 입력으로 받아 현재 체력에서 데미지를 빼며, Clamp함수를 통해 체력이 0 미만으로 떨어지지 않게 합니다.</br>
+만약 데미지 계산이후 현재 체력이 0이하라면 해당 Actor는 죽은 것이므로 IsDefeated변수를 True로 바꿔 다른 시스템이 알 수 있게합니다.</br>
+
+![ReceiveDamage](https://github.com/user-attachments/assets/b736b062-6dca-47b2-b670-b82958f8ef25)
+<div align="center"><strong>Receive Damage함수</strong></div></BR>
