@@ -165,7 +165,70 @@ Actor Component인 BPC_Vitality는 게임 시작 시 초기 체력을 세팅하�
 AnyDamage는 언리얼엔진에서 제공하는 함수로 피격판정을 받을 경우 활성화 되는 이벤트 노드입니다.</br>
 BPC_Vitality에서 IsDefeated변수를 통해 Actor의 생사를 확인하고 죽지 않았다면 BPC_Vitality에 있는 Receive Damage 함수를 호출합니다.</br>
 Receive Damage함수는 받은 데미지 수치를 입력으로 받아 현재 체력에서 데미지를 빼며, Clamp함수를 통해 체력이 0 미만으로 떨어지지 않게 합니다.</br>
+
 만약 데미지 계산이후 현재 체력이 0이하라면 해당 Actor는 죽은 것이므로 IsDefeated변수를 True로 바꿔 다른 시스템이 알 수 있게합니다.</br>
 
 ![ReceiveDamage](https://github.com/user-attachments/assets/b736b062-6dca-47b2-b670-b82958f8ef25)
 <div align="center"><strong>Receive Damage함수</strong></div></BR>
+
+### [플레이어 피격 시]
+플레이어는 몬스터가 쏘는 불덩이 뿐만 아니라 몸체끼리 부딪혀도 데미지를 받습니다.</br>
+몬스터 측에서 데미지 계산을 할 시 피격 대상이 누군지 매번 알아야하고 피격 대상의 hp를 깍아야하므로 비효율적이라 생각해 BP_Player에서 계산하도록 했습니다.</br>
+
+![overlap](https://github.com/user-attachments/assets/25369f18-20b0-41f6-b9d7-e3ddeeb3ab1e)
+<div align="center"><strong>Overlap이벤트 발생 시</strong></div></BR>
+
+몬스터가 가진 캡슐 컴포넌트와 Player가 가진 캡슐 컴포넌트가 겹쳐질 시 Begin Overlap이벤트가 발생합니다.</br>
+플레이어가 부딪힌 대상이 몬스터인지 확인하기 위해 Begin Overlap에서 상대측 Actor가 BaseEnemy기반으로 만들어진 Actor인지 체크합니다.</br></br>
+
+특정 몬스터는 선제 공격 특성을 지녀 어그로 범위를 갖고 있습니다. 어그로 범위 또한 충돌 컴포넌트를 사용하므로 어그로 범위 안에 들어간 것만으로도 Overlap이벤트를 발생시키고 데미지를 받게됩니다.</br>
+문제점을 해결하기 위해 Overlap노드에서 출력되는 Other Comp와 몬스터가 가진 캡슐 컴포넌트가 같은지 판별합니다.</br>
+Other Comp는 CollisionCylinder을 반환하며, 이는 해당 Actor가 가지고 있는 콜리전을 의미합니다.</br>
+부딪힌 몬스터의 캡슐 컴포넌트와 Overlap됐을 때만 데미지가 적용되도록 Branch노드를 사용하고 몬스터의 캡슐 컴포넌트가 맞다면 Apply Damage를 자기자신한테 적용시킵니다.</br></br>
+
+![super](https://github.com/user-attachments/assets/8ed9e263-c049-457c-b94b-e7b47d40676f)
+<div align="center"><strong>피격 시 무적 이벤트 발동</strong></div></BR>
+
+피격 후에도 반복적으로 몬스터를 접촉해 빠르게 플레이어의 체력을 소진하는 것을 방지하기 위해 피격 이후 몇 초간 무적 시간을 추가했습니다.</br>
+플레이어의 캡슐 컴포넌트를 가져와 콜리전 채널에서 Pawn을 Ignore하도록 바꿔 충돌을 무시하도록 하고,
+자신이 무적상태인지 아닌지 확인하기 위해 Sprite가 깜박이는 이벤트를 추가했습니다.</br>
+
+![clear](https://github.com/user-attachments/assets/e12b2bf2-16dc-4ded-9e0a-8e576696007c)
+<div align="center"><strong>일정 시간 후 무적 이벤트 종료</strong></div></BR>
+
+무적 시간 동안 Delay를 주고 이후 Sprite관련 이벤트를 종료시키고 플레이어의 캡슐 컴포넌트의 콜리전 채널을 다시 원상복귀 시켜 몬스터와 충돌이 가능하도록 했습니다.</br>
+무적 일 시 플레이어의 Sprite를 깜빡인 후, 무적이 꺼진다면 Sprite가 꺼진 채로 돌아올지 켜진 채로 돌아올지 예측이 힘드므로 Set Visibility노드를 통해 Sprite가 보이도록 했습니다.</br></br>
+
+몬스터와 플레이어 캐릭터가 계속 겹쳐있을 시, Sprite가 비정상적으로 깜빡이던 버그가 생겼습니다.</br>
+해당 버그는 Sprite관련 이벤트 노드를 SetCollisionResponsetoChannel노드 뒤에 배치하여 생겼습니다.</br>
+Sprite 이벤트는 종료되지 않았지만 무적 시간이 풀려 다시 Overlap이벤트가 발생해 Sprite 이벤트가 종료되지 않은 채 다시 호출되어 생긴 버그였습니다.</br>
+따라서 두 노드의 순서를 바꿔 버그를 고쳤습니다.</br>
+
+![damaged](https://github.com/user-attachments/assets/9db6e0bb-a992-40f5-96c1-3d9dad38f728)
+<div align="center"><strong>몬스터에게 피격 시 튕겨나가는 플레이어</strong></div></BR>
+또한 피격 시 플레이어가 몬스터에게 가만히 있는 것이 아니라 부딪힌 몬스터가 있는 방향의 반대로 튕겨나가도록 했습니다.</br>
+몬스터가 플레이어의 오른쪽에서 부딪혔으면 왼쪽으로 튕겨나가며, 왼쪽에서 부딪히면 오른쪽으로 튕겨나갑니다.</br>
+이를 위해서 현재 플레이어의 위치와 플레이어와 부딪힌 Actor의 위치를 알아야합니다.</br>
+
+![knockback](https://github.com/user-attachments/assets/cf46e8af-8582-492a-97b5-55e3c022270f)
+<div align="center"><strong>튕겨나갈 방향 구하기</strong></div></BR>
+
+부딪힌 몬스터는 Overlap이벤트에서 BaseEnemy인지 체크하고 맞다면 해당 몬스터를 Apply Damage노드의 Damage Causer에 입력값으로 줬습니다.</br>
+Apply Damage노드가 활성화 되면 언리얼엔진에서 제공하는 AnyDamage이벤트가 발생하며 해당 이벤트는 Damage Causer를 출력합니다.</br>
+이렇게하여 몬스터의 위치와 플레이어의 위치를 구하고 두 위치를 알 수 있으므로 몬스터가 플레이어를 기준으로 어느 방향에 있는지 Find Look at Rotation노드를 통해 확인 할 수 있습니다.</br>
+몬스터가 플레이어의 오른쪽에 있으면 X값이 양수가 나오고, 왼쪽에 있으면 X값이 음수가 나오므로, 플레이어가 반대 방향으로 튕길 수 있도록 Select Float노드를 작성했습니다.</br>
+
+![damaged1](https://github.com/user-attachments/assets/d29ad391-f64f-4682-8bbd-871d9494142d)
+<div align="center"><strong>튕겨나가는 애니메이션 설정하기</strong></div></BR>
+구한 방향에 얼마만큼 튕겨질지 수치를 정해 Lauch Character 노드를 통해 Character가 튕겨지도록 합니다.</br>
+플레이어가 튕겨질 시 키보드의 입력에 영향을 받지 않도록 XYZ축을 Override하여 강제적으로 튕겨진 수치만큼 캐릭터가 움직이도록 했습니다.</br>
+이후 JumptoNode노드를 사용하여 Animation 컴포넌트를 통해 현재 상태에서 JumpStun상태의 애니메이션으로 건너뛰어 재생하도록 했습니다.</br>
+이를 통하여 플레이어는 피격한 몬스터의 위치에서 반대로 튕겨나가는 위치를 갖고 해당 상태에 알맞은 애니메이션이 재생됩니다.</br>
+
+![stun](https://github.com/user-attachments/assets/0d66393e-7198-4001-be04-28d2af241b88)
+<div align="center"><strong>기절 상태 구현하기</strong></div></BR>
+
+플레이어가 피격되어 튕겨나갈 때는 기절 상태를 부여하여 튕겨나가는 동안 이동과 공격을 방지하고자 Boolean타입으로 상태를 저장했습니다.</br>
+일정 시간후 스턴 상태가 풀리고 초반에 설정한 Lateral Friction또한 기본 값으로 되돌려 움직임이 정상적으로 회복되도록 했습니다.</br>
+
+### [공격 구현]
