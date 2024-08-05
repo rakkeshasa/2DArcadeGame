@@ -144,6 +144,8 @@ Player Controller를 통해 Convert World Location To Screen노드를 가져와 
 클래스 이름을 Key값으로 하고, 회복할 샷 에너지 양인 int형을 Value값으로 갖는 맵에서 Find함수를 통해 샷 에너지를 몇을 회복할지 결정합니다.</br>
 샷 에너지는 최대 3발로 3발이 넘지 않도록 MIN노드를 이용하여 조정했습니다.</BR>
 
+---
+
 ### [체력 설정]
 몬스터와 플레이어 캐릭터는 Actor로 일정 체력을 갖고 있으며, 공격에 맞을 시 데미지에 따라 체력이 닳습니다.</BR>
 Actor Component를 통해 체력 시스템을 만들고 몬스터와 플레이어 캐릭터에게 컴포넌트를 부착하는 형식으로 시스템을 구축했습니다.</BR></br>
@@ -170,6 +172,8 @@ Receive Damage함수는 받은 데미지 수치를 입력으로 받아 현재 �
 
 ![ReceiveDamage](https://github.com/user-attachments/assets/b736b062-6dca-47b2-b670-b82958f8ef25)
 <div align="center"><strong>Receive Damage함수</strong></div></BR>
+
+---
 
 ### [플레이어 피격 시]
 플레이어는 몬스터가 쏘는 불덩이 뿐만 아니라 몸체끼리 부딪혀도 데미지를 받습니다.</br>
@@ -231,4 +235,32 @@ Apply Damage노드가 활성화 되면 언리얼엔진에서 제공하는 AnyDam
 플레이어가 피격되어 튕겨나갈 때는 기절 상태를 부여하여 튕겨나가는 동안 이동과 공격을 방지하고자 Boolean타입으로 상태를 저장했습니다.</br>
 일정 시간후 스턴 상태가 풀리고 초반에 설정한 Lateral Friction또한 기본 값으로 되돌려 움직임이 정상적으로 회복되도록 했습니다.</br>
 
-### [공격 구현]
+---
+
+### [차지샷 구현]
+차지샷은 일정 시간 동안 공격 버튼을 누르면 3발을 소모하는 대신 데미지가 더 높은 샷을 발사하는 기능입니다.</br>
+몇 초 동안 공격키를 눌렀는지 알기 위해서는 키 설정을 별도로 해줘야합니다.</br></br>
+
+![Released](https://github.com/user-attachments/assets/c8756a31-28d7-48ba-883a-14a3affa4cc5)
+<div align="center"><strong>트리거 설정하기</strong></div></BR>
+
+트리거를 해제됨(Released)로 설정할 시 입력이 지속되는 동안 트리거가 Ongoing을 반환하며 Ongoing을 통해 입력이 지속될 동안 어떤 행동을 할지 정할 수 있습니다.</br>
+게임에서는 공격 버튼을 계속 누를 시 플레이어가 흰색으로 깜빡이며 점차 푸르게 되어 차지가 완료됐다는 것을 시각적으로 확인할 수 있고, 특유의 차징 사운드를 플레이시켜 공격키를 계속 누르고 있다는 것을 알 수 있게 했습니다.</br></br>
+
+![IA_Shoot](https://github.com/user-attachments/assets/aacceeba-9f39-45d4-a6ae-b2b622ccc937)
+<div align="center"><strong>플레이어 공격 시스템</strong></div></BR>
+
+플레이어가 맞고 있거나 슬라이딩 중에는 공격을 하지 못하며 공격키를 짧게 누를 시 기본 샷 투사체가 나가며, 공격키를 계속 누르고 있을 시 위에서 설명한 내용을 Handle Charge Flash 함수에서 실행합니다.</br>
+IA_Shoot에서 주어지는 Elapsed Seconds을 통해 Try ChargeShot 함수에서 특정 시간보다 짧다면 기본 샷이 나가고 길다면 차지 샷이 나가도록 Branch노드를 이용하여 구현했습니다.</br></br>
+
+![shot](https://github.com/user-attachments/assets/86f22f6d-6775-441e-b8a7-bf70cc712ea6)
+<div align="center"><strong>샷에 따른 샷 에너지 관리</strong></div></BR>
+
+플레이어는 3개의 샷 에너지를 가지고 있어 무한정으로 샷을 쏠 수 없습니다.</br>
+샷을 발사할 준비가 완료되면 발사할 투사체가 몇 개의 샷 에너지를 필요로 한지 확인하고 현재 샷 에너지에서 사용할 에너지 양을 뺀 후 발사체를 월드에 생성합니다.</br>
+차지샷은 3개의 샷 에너지를 모두 소모하고, 일반 샷은 1개의 에너지만을 필요로 합니다.</br>
+발사된 투사체는 파괴되면 발사체 클래스가 가지고 있는 Restore Shot Energy 함수를 호출해 샷 에너지를 회복하게 됩니다.</br>
+
+---
+
+### [벽 점프 구현]
