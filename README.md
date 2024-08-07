@@ -264,3 +264,44 @@ IA_Shoot에서 주어지는 Elapsed Seconds을 통해 Try ChargeShot 함수에�
 ---
 
 ### [벽 점프 구현]
+플레이어가 벽에 있을 경우 2가지 행동을 할 수 있습니다.</br>
+첫 번째는 벽을 차고 반대편으로 점프하는 것이고, 두 번째는 벽에 기대서 천천히 내려가는 것입니다.</br>
+그러기 위해서는 플레이어 앞에 현재 벽이 있는지 확인할 필요가 있습니다.</br></br>
+
+![CheckWall](https://github.com/user-attachments/assets/f5e3f781-3af6-43dd-b236-dcc81cc96fe6)
+<div align="center"><strong>벽의 유무 확인하기</strong></div></BR>
+
+플레이어의 위치를 알아내고, 앞 방향 벡터를 구해 플레이어의 일정 범위 내에 벽이 있는지 확인합니다.</br>
+벽은 게임 환경으로 World Static 오브젝트 타입이므로 확인할 오브젝트 타입으로 World Static을 세팅합니다.</br>
+Line Trace For Objects 노드는 플레이어의 앞 방향의 일정 범위 내에 World Static 타입 물체가 있을 경우 True를 반환합니다.</br>
+여기서는 World Static타입인 벽이 Line Trace안에 들어오면 True를 반환하게 되고 없으면 False를 반환하게 됩니다.</br></br>
+
+![WallSlide](https://github.com/user-attachments/assets/4b573cbe-c14a-42bc-9550-c6fc0f20c915)
+<div align="center"><strong>벽에 기댈 경우</strong></div></BR>
+
+플레이어가 벽을 탐지하는 범위를 벽에 붙을 정도로 설정해주고 플레이어가 벽에 붙어 있다면 일정 속도로 내려가도록 해줍니다.</br>
+X와 Y축 방향으로는 움직일 필요가 없으므로 Character Movement에서 그대로 사용하고 Z축의 경우 MAX 노드를 사용하여 떨어지는 속도를 조절합니다.</BR>
+MAX노드를 사용한 이유는 평지에서 벽에 기댄 경우 무조건 아래로 천천히 내려가도록 하지 않기 위해 사용했습니다.</BR>
+평지에서 이동하다가 벽에 기댄 경우 Character Movement에서 Z축의 속도는 0이므로 MAX노드를 통해 0이 나오므로 아래로 내려가지 않습니다.</BR></br>
+
+![condition](https://github.com/user-attachments/assets/199e28b5-ac67-4a40-92cf-8a21a03955a6)
+<div align="center"><strong>벽 슬라이딩이 나오는 상황</strong></div></BR>
+
+MAX노드를 통해 평지에서 벽에 기댄다고 아래로 내려가지 않게 하였지만 애니메이션의 경우 상황이 다릅니다.</BR>
+평지에서 벽에 부딪혔다고 벽 슬라이딩 애니메이션이 나오면 좋지 않은 플레이 경험을 주므로 벽 슬라이딩을 하는 조건을 지정해줬습니다.</BR>
+첫 번째로는 플레이어가 일정 속도 이상으로 Z축 방향으로 나아가는 중이여야 합니다. 즉, 일정 속도 이상으로 추락중이여야 벽을 탐지할 수 있게 했습니다.</BR>
+그리고 벽 방향으로 이동 키를 지속적으로 눌러야 앞에 있는 벽을 탐지하여 벽에서 천천히 아래로 슬라이딩하도록 했습니다.</BR>
+벽을 탐지하지 못하는 경우 아래로 추락하게 됩니다.</BR></br>
+
+벽에 슬라이딩 중인 경우 공중에 체공하고 있는 중이기 때문에 엔진 상에서는 점프 중으로 인식하고 있습니다.</br>
+문제점은 점프 중인 경우 엔진에서 제공하는 Jump 노드가 작동되지 않습니다. 체공 상태에서 한 번 더 점프하기 위해서는 Launch Character 노드를 이용하여 강제적으로 캐릭터의 위치를 이동시켜줍니다.</br></br>
+
+![WallJump](https://github.com/user-attachments/assets/4cf53660-573f-4eb7-95db-3416be3ee1fa)
+<div align="center"><strong>벽 점프 구현하기</strong></div></BR>
+
+벽에서 박차가 나가기 때문에 반대방향으로 나가도록 X축에 -1을 곱해주고 점프할 높이만큼 Lauch Velocity Z에 값을 입력합니다.</BR>
+여기서 추락 및 측면 마찰로 인해 캐릭터가 마찰력에 의해 점프력이 크게 저하되므로 캐릭터의 위치를 이동시키기 전에 추락 및 측면 마찰을 0으로 세팅합니다.</BR>
+벽 점프가 완료되면 마찰력을 초기 세팅으로 되돌려 정상적인 움직임이 가능하도록 했습니다.</BR>
+
+---
+
