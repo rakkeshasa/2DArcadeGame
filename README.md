@@ -305,3 +305,40 @@ MAX노드를 통해 평지에서 벽에 기댄다고 아래로 내려가지 않�
 
 ---
 
+### [체크포인트 구현]
+
+몬스터가 죽을 시 이벤트를 발생 시켜 Destroy노드를 이용해 몬스터를 게임 상에서 없애면 되지만, 플레이어의 경우 부활시켜서 체크포인트 지점에서 플레이할 수 있도록 해야합니다.</br>
+BaseCharacter에서 AnyDamage 노드를 통해 입은 데미지만큼 체력을 빼줬으며 체력이 0 이하로 내려가면 isDefeated 변수를 True로 하고 Defeated 이벤트를 발생시킵니다.</br>
+BP_Player에서는 BeginPlay 노드에 Defeated 이벤트를 바인딩하여 이벤트가 발생하면 플레이어 소생절차가 시작됩니다.</br></br>
+
+![Respawn](https://github.com/user-attachments/assets/3e916e02-f085-48e3-a405-45a7fa13b168)
+<div align="center"><strong>새로운 플레이어 소환하기</strong></div></BR>
+
+플레이어 리스폰 시 기존 캐릭터를 그대로 이용하고 체력을 다시 채우는 방법과 기존 캐릭터를 삭제하고 새 캐릭터로 바꾸는 2가지 방법이 있었습니다.</br>
+2가지 방안 중 스탯 관련 버그를 배제하기 위해 기존 캐릭터는 삭제하고 새 캐릭터로 대체하는 방안을 채택했습니다.</br>
+Spawn Actor노드를 통해 BP_Player의 Actor가 스타트 지점에서 소환되도록 했으며, Player Controller를 주어 플레이어가 제어할 수 있도록 했습니다.</br>
+체력이 0으로 떨어진 기존 Actor는 Destroy 처리를 하지 않으면 맵 상에서 존재하게 되므로 새 플레이어를 소환 후 기존 플레이어를 삭제했습니다.</br></br>
+
+시작점에 가까이에서 플레이어가 죽을 시 부활 후 기존 플레이어를 볼 수 있다는 가능성과 기존 플레이어에 카메라가 세팅되어 있다는 문제점이 생겼습니다.</br>
+첫 번째 문제점은 죽은 플레이어의 Collision을 No Collision으로 설정해 어떤 물체와도 충돌하지 않게 해 게임 맵에서 추락하도록 했습니다.</br>
+카메라 문제는 Detach Component를 통해 기존 플레이어에서 카메라가 부착된 Spring Arm을 떼냈습니다.</br>
+이렇게하면 플레이어가 죽을 시 카메라가 죽은 장소에 고정되고 플레이어는 아래로 떨어지게 됩니다. 플레이어가 죽었다는 효과를 확실히 주기 위해 장면을 비추는 카메라를 어둡게 해주고 부활하면 다시 카메라가 새 캐릭터를 비추는 동시에 밝아지도록 했습니다.</br></br>
+
+![Death](https://github.com/user-attachments/assets/95b075b2-2d20-4bbe-9efd-894809e82ec7)
+<div align="center"><strong>플레이어 사망 시 카메라 설정</strong></div></BR>
+
+이렇게 하여 플레이어가 죽었을 시 카메라 효과와 재소환하는 기능을 구현했습니다.</br>
+
+![CheckPoint](https://github.com/user-attachments/assets/7f421904-2ebb-406e-ad58-332f43eb20d0)
+<div align="center"><strong>체크 포인트 구현</strong></div></BR>
+
+체크포인트는 간단한 충돌 이벤트가 있는 Actor로 자신의 Collision에 플레이어가 부딪힌다면 체크포인트의 위치를 저장하면 됩니다.</br>
+우선 부딪힌 대상이 BP_Player 타입의 Actor인지 캐스팅하여 체크하고 체크포인트가 여러번 활성화 되는 것을 방지하기 위해 Do Once노드를 사용했습니다.</br>
+이후 GameMode인 GM_Action에 자기의 위치를 GM_Action의 변수인 ActiveCheckpoint에 저장합니다.</br>
+
+![CheckpointRespawn](https://github.com/user-attachments/assets/76388696-128d-4c58-8f27-2e3d7f374a35)
+<div align="center"><strong>체크 포인트에서 부활하기</strong></div></BR>
+
+게임모드는 ActiveCheckpoint의 유무에 따라 플레이어 리스폰 위치를 결정합니다.</br>
+플레이어가 죽어 BaseCharacter에서 Defeated 이벤트가 발생하면 BP_Player에 바인딩 된 Defeated 이벤트가 활성화되고, Defeated는 게임 모드인 GM_Action의 함수 Respawn를 호출하게 됩니다.</br>
+GM_Action은 활성화 된 체크포인트의 유무에 따라 부활 장소를 지정하여 새로운 BP_Player 액터를 소환하게 됩니다.</br>
