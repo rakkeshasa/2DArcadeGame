@@ -342,3 +342,55 @@ Spawn Actor노드를 통해 BP_Player의 Actor가 스타트 지점에서 소환�
 게임모드는 ActiveCheckpoint의 유무에 따라 플레이어 리스폰 위치를 결정합니다.</br>
 플레이어가 죽어 BaseCharacter에서 Defeated 이벤트가 발생하면 BP_Player에 바인딩 된 Defeated 이벤트가 활성화되고, Defeated는 게임 모드인 GM_Action의 함수 Respawn를 호출하게 됩니다.</br>
 GM_Action은 활성화 된 체크포인트의 유무에 따라 부활 장소를 지정하여 새로운 BP_Player 액터를 소환하게 됩니다.</br>
+
+---
+
+### [몬스터 구현]
+
+꽃게 몬스터는 제일 간단하고 쉬운 몬스터로 화면상에서 좌우로 움직이는 몬스터입니다.</br>
+몬스터에게 행동을 주기 위해 AI Controller 타입의 블루프린트를 생성하고 AI Controller가 꽃게 몬스터의 제어권을 가질 때 매 틱마다 앞으로 나아가게했습니다.</br>
+BP_Crab에서는 WalkFoward 이벤트를 생성하여 현재 Actor의 앞 방향 벡터를 구해 Add Movement Input 노드로 앞으로 가게 했습니다.</br>
+AI Controller는 매 틱마다 BP_Crab에 있는 WalkFoward 이벤트를 호출하게 되어 꽃게가 앞으로 나아가게 합니다.</br></br>
+
+![AIC_Crab](https://github.com/user-attachments/assets/ee60fcb5-b10a-4944-ba9f-fa4fb39dfd02)
+<div align="center"><strong>AI Controller 예시</strong></div></BR>
+
+꽃게 몬스터의 행동 포인트는 벽이나 절벽을 만나면 가던 방향을 멈추고 되돌아오는 것입니다.</br>
+이를 위해서는 플레이어가 벽을 탐지하듯이 꽃게가 벽과 절벽을 탐지가 가능해야합니다. 플레이어의 벽 점프 구현시 라인 트레이스를 사용했으나 꽃게에서는 콜리전 박스를 이용하여 구현해봤습니다.</br></br>
+
+![CrabCollision](https://github.com/user-attachments/assets/67b665bd-74bb-4c8d-92d6-722fa3903208)
+<div align="center"><strong>벽 및 절벽 식별을 위한 콜리전</strong></div></BR>
+
+그림과 같이 콜리전 박스를 꽃게에 할당하고 해당 박스에 게임 환경인 벽이나 절벽인 WorldStatic타입 물체가 감지되면 꽃게가 좌우대칭 시키도록 했습니다.</br>
+각 콜리전이 WorldStatic타입 물체와 만나면 Overlap이벤트가 발생하며 Overlap 이벤트는 Turn Character 함수를 호출합니다.</br>
+Turn Character 함수는 현재 꽃게의 Rotation을 갖고 와 Z축으로 180도를 회전시켜 Set Actor Rotation 노드를 통해 꽃게를 회전시켜줬습니다.</br>
+
+도마뱀 몬스터는 제자리에서 원거리 공격을 날리는 몬스터입니다.</br>
+AI Controller가 도마뱀 몬스터를 제어하면 BP_Lizard에 있는 Shoot Projectile함수를 호출합니다.</br>
+도마뱀이 공격을 하는 횟수는 Tick 이벤트를 통해서 하지 않고 일정 시간 마다 공격을 하도록 Set Timer by Event 노드를 사용했습니다.</br>
+해당 노드는 개발자가 정해준 시간마다 Shoot Projectile함수를 호출하여 도마뱀이 일정시간마다 파이어볼을 날리도록 합니다.</br></br>
+
+![AIC_Lizard](https://github.com/user-attachments/assets/9700110c-ecb2-401b-869a-61205e5ea6e2)
+<div align="center"><strong>도마뱀 몬스터의 AI Controller</strong></div></BR>
+
+박쥐 몬스터는 정해진 두 좌표를 날라다니는 몬스터입니다.</br>
+두 지점을 World상에서 우선 좌표를 구하고 값을 저장하여 해당 좌표를 왔다갔다하며 날라다니는 형태입니다.</br></br>
+
+![Bat](https://github.com/user-attachments/assets/acef40c3-602d-4613-acc6-dfc0896d8375)
+<div align="center"><strong>박쥐에 있는 두 지점</strong></div></BR>
+
+두 지점의 좌표가 구해졌으면 박쥐가 어느 한 지점에 도착하면 다시 다른 지점에 돌아가도록 구현을 해줘야합니다.</br>
+TimeLine 노드를 사용하여 A 지점에서 B 지점으로 1초안에 가도록 정해주고 해당 이동이 끝난다면 TimeLine 노드의 Reverse from End에 있는 Move Backward 이벤트를 통해 다시 B지점에서 A지점으로 갈 수 있게 했습니다.</br>
+한 가지 문제점은 TimeLine이 언제 끝나는지 알아야하므로 TimeLine 노드의 Finished 출력을 통해 종료가 되면 다른 이벤트를 호출할 수 있도록 FlipFlop 노드를 사용했습니다.</br>
+따라서 박쥐가 Move Forward를 통해 A 지점에서 B 지점으로 도착했으면 TimeLine의 Finished가 활성화되어 Flip Flop노드가 Forward가 아닌 이벤트인 Move Backward 이벤트를 호출하여 다시 되돌아가게 됩니다.</br></br>
+
+![AIC_Bat](https://github.com/user-attachments/assets/21cd5316-af1d-40c8-894e-d24516d77670)
+<div align="center"><strong>박쥐 움직임 구현하기</strong></div></BR>
+
+눈깔 몬스터는 플레이어가 해당 몬스터의 일정 범위안에 들어오면 선제 공격을 가하는 몬스터입니다.</br>
+어그로 범위를 설정해주기 위해 구형 콜리전을 눈깔 몬스터에게 추가해주고 해당 콜리전에 Overlap이벤트를 추가합니다.</br>
+어그로 범위를 담당하는 콜리전은 충돌 시 충돌 대상이 BP_Player 타입 Actor인지 확인하고, 맞다면 변수로 저장합니다.</br>
+AI Controller에서는 변수로 저장한 BP_Player가 존재하는지 확인하고 존재한다면 눈깔 몬스터와 플레이어의 방향을 구하여 플레이어를 향하여 몬스터가 움직이도록 합니다.</br>
+
+![AIC_Eye](https://github.com/user-attachments/assets/ad40a01c-55f6-4319-8103-8e93809cc19f)
+<div align="center"><strong>눈깔 몬스터의 AI Controller</strong></div></BR>
