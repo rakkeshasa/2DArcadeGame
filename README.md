@@ -18,6 +18,7 @@
   * [벽 점프 구현](#벽-점프-구현)
   * [체크포인트 구현](#체크포인트-구현)
   * [몬스터 구현](#몬스터-구현)
+- [사용한 플러그인과 에셋](#사용한-플러그인과-에셋)
 
 ## 간단한 소개
 블루프린트로만 제작한 단일 스테이지 아케이드 게임입니다.</BR></BR>
@@ -402,3 +403,28 @@ AI Controller에서는 변수로 저장한 BP_Player가 존재하는지 확인�
 
 ![AIC_Eye](https://github.com/user-attachments/assets/ad40a01c-55f6-4319-8103-8e93809cc19f)
 <div align="center"><strong>눈깔 몬스터의 AI Controller</strong></div></BR>
+
+## 사용한 플러그인과 에셋
+
+<strong>1. PaperZD</strong>
+![PaperZD](https://github.com/user-attachments/assets/15cdb747-176d-4b8f-9411-653a0d63ecf8)
+</br>
+PaperZD는 2D 프로젝트에 대한 Unreal Engine의 애니메이션 지원 부족에 대한 해결책으로, 2D 프로젝트를 관리하는 데 필요한 기능을 사용하여 자신만의 애니메이션 Blueprint를 쉽게 만들 수 있는 플러그인입니다.</br></br>
+
+<strong>2. Super Grotto Escape Pack</strong>
+![Asset](https://github.com/user-attachments/assets/088f18b8-35da-4bfb-a0b7-06003e974349)
+</br>
+몬스터와 플레이어 외형에 사용된 에셋입니다.</br>
+https://ansimuz.itch.io/super-grotto-escape-pack</br></br>
+
+<strong>3. Kenney UI Pack</strong>
+![UI](https://github.com/user-attachments/assets/bb0bf4f7-17fb-44e2-aa62-5d472ac87328)
+</br>
+게임 내에서 사용한 UI 에셋입니다.</BR>
+https://kenney.nl/assets/ui-pack-space-expansion</br></br>
+
+<strong>4. OpenGameArt</strong>
+![Sound](https://github.com/user-attachments/assets/6e8c0c11-b833-4afc-b418-34e69a974267)
+</br>
+게임 내에서 사용된 사운드 에셋입니다.</BR>
+https://opengameart.org/</BR></BR>
