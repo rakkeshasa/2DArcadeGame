@@ -247,6 +247,8 @@ Apply Damage 노드가 활성화되면 언리얼엔진에서 제공하는 AnyDam
 ---
 
 ### [차지샷 구현]
+![chargeshot](https://github.com/user-attachments/assets/a778ea26-9c56-4f92-81f2-2f65fec9f3e9)
+
 차지 샷은 일정 시간 동안 공격 버튼을 누르면 3발을 소모하는 대신 데미지가 더 높은 샷을 발사하는 기능입니다.</br>
 몇 초 동안 공격키를 눌렀는지 알기 위해서는 키 설정을 별도로 해줘야 합니다.</br></br>
 
@@ -273,6 +275,8 @@ IA_Shoot에서 주어지는 Elapsed Seconds를 통해 Try ChargeShot 함수에�
 ---
 
 ### [벽 점프 구현]
+![WallJump](https://github.com/user-attachments/assets/44e7c8d7-4e27-4f12-96ba-0df21ff728f0)
+
 플레이어가 벽에 있을 경우 2가지 행동을 할 수 있습니다.</br>
 첫 번째는 벽을 차고 반대편으로 점프하는 것이고, 두 번째는 벽에 기대서 천천히 내려가는 것입니다.</br>
 그러기 위해서는 플레이어 앞에 현재 벽이 있는지 확인할 필요가 있습니다.</br></br>
